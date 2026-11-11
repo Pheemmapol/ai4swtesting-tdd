@@ -1,20 +1,28 @@
 class Timesheet {
-  timesheets = new Map();
+  #timesheets = new Map();
 
   submitTimesheet(projectName, duration) {
-    if (this.timesheets.has(projectName)) {
-      duration += this.timesheets.get(projectName);
+    if (typeof projectName !== 'string' || projectName.trim() === '') {
+      return false;
     }
-    this.timesheets.set(projectName, duration);
+    if (typeof duration !== 'number' || !Number.isFinite(duration) || duration <= 0) {
+      return false;
+    }
+    if (duration % 0.5 !== 0) {
+      return false;
+    }
+
+    const name = projectName.trim();
+    this.#timesheets.set(name, this.getTotalTimesheetHours(name) + duration);
     return true;
   }
 
   getTimesheets() {
-    return [...this.timesheets.values()];
+    return [...this.#timesheets].map(([projectName, hours]) => ({ projectName, hours }));
   }
 
   getTotalTimesheetHours(projectName) {
-    return this.timesheets.get(projectName);
+    return this.#timesheets.get(projectName) ?? 0;
   }
 }
 
